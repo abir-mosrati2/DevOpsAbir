@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'wsl-agent' }
 
     environment {
         DOCKER_USER = 'AbirMosrati'
@@ -15,12 +15,14 @@ pipeline {
 
         stage('Build Maven') {
             steps {
+                sh 'mvn -v'
                 sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Build Docker Image') {
             steps {
+                sh 'docker version'
                 sh 'docker build -t $DOCKER_USER/student-management:latest .'
             }
         }
