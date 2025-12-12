@@ -1,15 +1,22 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'M2_HOME'
-    }
-
     stages {
-        stage('GIT') {
+        stage('Build') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/abir-mosrati2/DevOpsAbir.git',
+                echo 'Building the project...'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
             }
         }
     }
