@@ -34,16 +34,19 @@ pipeline {
                 """
             }
         }
+        
 stage('Login to Docker Hub (WSL)') {
-  steps {
-    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds',
-                                      usernameVariable: 'DOCKERHUB_USER',
-                                      passwordVariable: 'DOCKERHUB_PASS')]) {
-      bat '''
-      wsl -e bash -lc "echo \"$DOCKERHUB_PASS\" | docker login -u \"$DOCKERHUB_USER\" --password-stdin"
-      '''
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'docker-hub-creds',
+            usernameVariable: 'DOCKERHUB_USER',
+            passwordVariable: 'DOCKERHUB_PASS'
+        )]) {
+            bat '''
+            wsl -e bash -lc "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
+            '''
+        }
     }
-  }
 }
 
 
