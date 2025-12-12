@@ -36,22 +36,20 @@ pipeline {
             }
         }
 
-        stage('Login to Docker Hub (WSL)') {
-            steps {
-                // Credential Jenkins recommandé: "Username with password"
-                // username = abirmosrati2
-                // password = dckr_pat_...
-                withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-creds',
-                    usernameVariable: 'DOCKERHUB_USER',
-                    passwordVariable: 'DOCKERHUB_PASS'
-                )]) {
-                    bat '''
-                    wsl -e bash -lc "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
-                    '''
-                }
-            }
-        }
+       stage('Login to Docker Hub (WSL)') {
+  steps {
+    withCredentials([usernamePassword(
+      credentialsId: 'docker-hub-creds',
+      usernameVariable: 'DOCKERHUB_USER',
+      passwordVariable: 'DOCKERHUB_PASS'
+    )]) {
+      bat '''
+      wsl -e bash -lc "env DOCKERHUB_USER=\\"%DOCKERHUB_USER%\\" DOCKERHUB_PASS=\\"%DOCKERHUB_PASS%\\" sh -lc 'echo \"$DOCKERHUB_PASS\" | docker login -u \"$DOCKERHUB_USER\" --password-stdin'"
+      '''
+    }
+  }
+}
+
 
         stage('Push Docker Image (WSL)') {
             steps {
