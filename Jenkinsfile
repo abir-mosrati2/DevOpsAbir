@@ -36,19 +36,19 @@ pipeline {
             }
         }
 
-       stage('Login to Docker Hub (WSL)') {
+    stage('Login to Docker Hub (WSL)') {
   steps {
-    withCredentials([usernamePassword(
-      credentialsId: 'docker-hub-creds',
+    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds',
       usernameVariable: 'DOCKERHUB_USER',
       passwordVariable: 'DOCKERHUB_PASS'
     )]) {
       bat '''
-      wsl -e bash -lc "env DOCKERHUB_USER=\\"%DOCKERHUB_USER%\\" DOCKERHUB_PASS=\\"%DOCKERHUB_PASS%\\" sh -lc 'echo \"$DOCKERHUB_PASS\" | docker login -u \"$DOCKERHUB_USER\" --password-stdin'"
+      wsl -e bash -lc "env DOCKERHUB_USER=\\"abirmosrati2\\" DOCKERHUB_PASS=\\"%DOCKERHUB_PASS%\\" sh -lc 'echo \"$DOCKERHUB_PASS\" | docker login -u \"$DOCKERHUB_USER\" --password-stdin'"
       '''
     }
   }
 }
+
 
 
         stage('Push Docker Image (WSL)') {
