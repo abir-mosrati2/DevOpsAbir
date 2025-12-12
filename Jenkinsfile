@@ -1,7 +1,15 @@
 pipeline {
+    agent any
 
     environment {
         DOCKER_USER = 'AbirMosrati'
+        IMAGE_NAME  = 'student-management'
+        IMAGE_TAG   = "${env.BUILD_NUMBER}"
+        IMAGE       = "${DOCKER_USER}/${IMAGE_NAME}"
+    }
+
+    options {
+        timestamps()
     }
 
     stages {
@@ -22,22 +30,29 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'docker version'
-                sh 'docker build -t $DOCKER_USER/student-management:latest .'
+                sh "docker build -t ${IMAGE}:${IMAGE_TAG} -t ${IMAGE}:latest ."
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_HUB_TOKEN')]) {
-                    sh 'echo $DOCKER_HUB_TOKEN | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push $DOCKER_USER/student-management:latest'
+                sh "docker push ${IMAGE}:${IMAGE_TAG}"
+                sh "docker push ${IMAGE}:latest"
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout || true'
         }
     }
 }
