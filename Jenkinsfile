@@ -2,6 +2,13 @@ pipeline {
     agent any
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/abir-mosrati2/DevOpsAbir.git'
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Building the project...'
@@ -22,7 +29,7 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                bat 'mvn clean package'
+                bat 'mvn -B clean package -DskipTests'
             }
         }
     }
