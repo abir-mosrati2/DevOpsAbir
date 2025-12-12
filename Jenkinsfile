@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'wsl-agent' }
+    agent any
 
     environment {
         DOCKER_USER = 'AbirMosrati'
