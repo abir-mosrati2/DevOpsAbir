@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'wsl-agent' }
 
     environment {
         DOCKER_USER = 'AbirMosrati'
@@ -13,49 +13,29 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                echo 'Building the project...'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
-            }
-        }
-
         stage('Build Maven') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %DOCKER_USER%/student-management:latest .'
+                sh 'docker build -t $DOCKER_USER/student-management:latest .'
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_HUB_TOKEN')]) {
-                    bat '''
-                        echo %DOCKER_HUB_TOKEN% | docker login -u %DOCKER_USER% --password-stdin
-                    '''
+                    sh 'echo $DOCKER_HUB_TOKEN | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                bat 'docker push %DOCKER_USER%/student-management:latest'
+                sh 'docker push $DOCKER_USER/student-management:latest'
             }
         }
     }
