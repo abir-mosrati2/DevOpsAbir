@@ -79,4 +79,11 @@ pipeline {
             bat 'wsl -e bash -lc "docker logout || true"'
         }
     }
+
+    stage('K8s (WSL) - Smoke Test') {
+    steps {
+        bat 'wsl -e bash -lc "kubectl version --client && kubectl config current-context && kubectl get nodes && kubectl get ns | head -n 20"'
+    }
+}
+
 }
