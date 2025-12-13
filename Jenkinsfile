@@ -5,11 +5,10 @@ pipeline {
         DOCKER_USER = 'abirmosrati2'
         IMAGE_NAME  = 'student-management'
         WSL_WORKDIR = '/mnt/c/Users/utilisateur/.jenkins/workspace/AbirProject2'
-        SONAR_HOST  = 'http://localhost:9000'
+        SONAR_HOST  = 'http://localhost:9000'  // URL de ton serveur SonarQube
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -19,6 +18,7 @@ pipeline {
 
         stage('Build Maven (Windows)') {
             steps {
+                bat 'mvn -v'
                 bat 'mvn clean package -DskipTests'
             }
         }
@@ -53,13 +53,12 @@ pipeline {
 
         stage('Login to Docker Hub (WSL)') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-creds',
-                    usernameVariable: 'DOCKERHUB_USER',
-                    passwordVariable: 'DOCKERHUB_PASS'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds',
+                  usernameVariable: 'DOCKERHUB_USER',
+                  passwordVariable: 'DOCKERHUB_PASS'
                 )]) {
                     bat '''
-                    wsl -e bash -lc "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
+                    wsl -e bash -lc "env DOCKERHUB_USER=\\"abirmosrati2\\" DOCKERHUB_PASS=\\"%DOCKERHUB_PASS%\\" sh -lc 'echo \"$DOCKERHUB_PASS\" | docker login -u \"$DOCKERHUB_USER\" --password-stdin'"
                     '''
                 }
             }
@@ -76,6 +75,7 @@ pipeline {
 
     post {
         always {
+            // Optionnel : éviter de laisser une session docker ouverte dans WSL
             bat 'wsl -e bash -lc "docker logout || true"'
         }
     }
