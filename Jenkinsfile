@@ -6,7 +6,6 @@ pipeline {
         IMAGE_NAME  = 'student-management'
         WSL_WORKDIR = '/mnt/c/Users/utilisateur/.jenkins/workspace/AbirProject2'
         SONAR_HOST  = 'http://localhost:9000'
-        SONAR_KEY   = 'student-management'
     }
 
     stages {
@@ -20,20 +19,18 @@ pipeline {
 
         stage('Build Maven (Windows)') {
             steps {
-                bat 'mvn -v'
                 bat 'mvn clean package -DskipTests'
             }
         }
 
-        stage('SonarQube Analysis (Maven)') {
+        stage('SonarQube Analysis') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    // On lance l'analyse sur Windows (mvn est déjà OK chez toi).
-                    // sonar.login est largement supporté (token SonarQube).
                     bat """
                     mvn sonar:sonar ^
-                      -Dsonar.host.url=${SONAR_HOST} ^
-                      -Dsonar.projectKey=${SONAR_KEY} ^
+                      -Dsonar.projectKey=student-management ^
+                      -Dsonar.projectName=student-management ^
+                      -Dsonar.host.url=%SONAR_HOST% ^
                       -Dsonar.login=%SONAR_TOKEN%
                     """
                 }
@@ -61,10 +58,8 @@ pipeline {
                     usernameVariable: 'DOCKERHUB_USER',
                     passwordVariable: 'DOCKERHUB_PASS'
                 )]) {
-                    // On force l'user abirmosrati2 (comme ton test WSL).
-                    // On injecte le token Windows -> WSL via env.
                     bat '''
-                    wsl -e bash -lc "env DOCKERHUB_USER=\\"abirmosrati2\\" DOCKERHUB_PASS=\\"%DOCKERHUB_PASS%\\" sh -lc 'echo \\"$DOCKERHUB_PASS\\" | docker login -u \\"$DOCKERHUB_USER\\" --password-stdin'"
+                    wsl -e bash -lc "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
                     '''
                 }
             }
