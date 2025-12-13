@@ -37,6 +37,11 @@ pipeline {
             }
         }
 
+          stage('K8s (WSL) - Smoke Test') {
+    steps {
+        bat 'wsl -e bash -lc "kubectl version --client && kubectl config current-context && kubectl get nodes && kubectl get ns | head -n 20"'
+    }
+
         stage('Docker (WSL) - Diagnostics') {
             steps {
                 bat 'wsl -e bash -lc "docker version && docker info"'
@@ -80,10 +85,7 @@ pipeline {
         }
     }
 
-    stage('K8s (WSL) - Smoke Test') {
-    steps {
-        bat 'wsl -e bash -lc "kubectl version --client && kubectl config current-context && kubectl get nodes && kubectl get ns | head -n 20"'
-    }
-}
+  
+
 
 }
