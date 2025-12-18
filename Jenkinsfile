@@ -5,7 +5,7 @@ pipeline {
         DOCKER_USER = 'abirmosrati2'
         IMAGE_NAME  = 'student-management'
         WSL_WORKDIR = '/mnt/c/Users/utilisateur/.jenkins/workspace/AbirProject2'
-        SONAR_HOST  = 'http://localhost:9000'
+        SONAR_HOST  = 'http://localhost:9000'  // URL de ton serveur SonarQube
     }
 
     stages {
@@ -20,6 +20,20 @@ pipeline {
             steps {
                 bat 'mvn -v'
                 bat 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    bat """
+                    mvn sonar:sonar ^
+                      -Dsonar.projectKey=student-management ^
+                      -Dsonar.projectName=student-management ^
+                      -Dsonar.host.url=%SONAR_HOST% ^
+                      -Dsonar.login=%SONAR_TOKEN%
+                    """
+                }
             }
         }
 
@@ -63,24 +77,11 @@ pipeline {
                 """
             }
         }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    bat """
-                    mvn sonar:sonar ^
-                      -Dsonar.projectKey=student-management ^
-                      -Dsonar.projectName=student-management ^
-                      -Dsonar.host.url=%SONAR_HOST% ^
-                      -Dsonar.token=%SONAR_TOKEN%
-                    """
-                }
-            }
-        }
     }
 
     post {
         always {
+            // Optionnel : éviter de laisser une session docker ouverte dans WSL
             bat 'wsl -e bash -lc "docker logout || true"'
         }
     }
