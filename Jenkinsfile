@@ -23,21 +23,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    bat """
-                    mvn sonar:sonar ^
-                      -Dsonar.projectKey=student-management ^
-                      -Dsonar.projectName=student-management ^
-                      -Dsonar.host.url=%SONAR_HOST% ^
-                      -Dsonar.token=%SONAR_TOKEN%
-
-                    """
-                }
-            }
-        }
-
+       
         stage('K8s (WSL) - Smoke Test') {
             steps {
                 bat 'wsl -e bash -lc "kubectl version --client && kubectl config current-context && kubectl get nodes && kubectl get ns | head -n 20"'
@@ -79,6 +65,22 @@ pipeline {
             }
         }
     }
+
+     stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    bat """
+                    mvn sonar:sonar ^
+                      -Dsonar.projectKey=student-management ^
+                      -Dsonar.projectName=student-management ^
+                      -Dsonar.host.url=%SONAR_HOST% ^
+                      -Dsonar.token=%SONAR_TOKEN%
+
+                    """
+                }
+            }
+        }
+
 
     post {
         always {
