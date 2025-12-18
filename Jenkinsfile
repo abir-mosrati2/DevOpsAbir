@@ -5,7 +5,7 @@ pipeline {
         DOCKER_USER = 'abirmosrati2'
         IMAGE_NAME  = 'student-management'
         WSL_WORKDIR = '/mnt/c/Users/utilisateur/.jenkins/workspace/AbirProject2'
-        SONAR_HOST  = 'http://localhost:9000'  // URL de ton serveur SonarQube
+        SONAR_HOST  = 'http://localhost:9000' 
     }
 
     stages {
